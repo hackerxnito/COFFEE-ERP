@@ -56,8 +56,10 @@ details.add summary{cursor:pointer;font-weight:600}
 <h1>Coffee ERP System</h1>
 <p class="sub">Progress and acceptance report. Review each completed feature, then approve it or return it with a comment.</p>
 <div class="meta">
+<div><label>Prepared for</label><input readonly value="Minnesota Coffee Marketers Limited"></div>
+<div><label>Attention</label><input readonly value="The Administrator"></div>
 <div><label>Prepared by</label><input readonly value="Kennedy Ngatia"></div>
-<div><label>Reviewed by</label><input id="revBy" readonly></div>
+<div><label for="revBy">Reviewed by (required)</label><input id="revBy" maxlength="60" placeholder="Reviewer's full name" autocomplete="off"></div>
 <div><label>Review date</label><input id="revDt" readonly></div>
 </div>
 <div class="bar">
@@ -140,12 +142,13 @@ document.getElementById("count").textContent=ap+" of "+rev.length+" approved"+(r
 var m=[];
 if(und)m.push(und+" completed item"+(und>1?"s":"")+" still to be approved or returned");
 if(noNote)m.push(noNote+" returned item"+(noNote>1?"s need":" needs")+" a comment");
+if(!ap&&!und&&!noNote)m.push("approve at least one item");
+if((S.rev||"").trim().length<3)m.push("enter the reviewer's full name");
 var ok=!m.length&&ap>0;
 var hint=document.getElementById("hint");
 hint.textContent=ok?"All items reviewed. The report can be downloaded.":"To download the report: "+m.join("; ")+".";
 hint.className="hint"+(ok?" good":"");
 document.getElementById("save").disabled=!ok;
-document.getElementById("revBy").value=ap>0?"Timothy":"Awaiting approval";
 document.getElementById("revDt").value=ap>0&&S.rd?S.rd:"Not yet reviewed";
 return{ap:ap,rw:rw,und:und,op:op,rev:rev};
 }
@@ -172,6 +175,7 @@ var id=e.target.dataset.n;if(!id)return;
 (S.st[id]=S.st[id]||{}).n=e.target.value;save();status();
 e.target.classList.toggle("need",S.st[id].v==="rework"&&!e.target.value.trim());
 });
+var rb=document.getElementById("revBy");rb.value=S.rev||"";rb.oninput=function(){S.rev=rb.value;save();status()};
 var sel=document.getElementById("aArea");
 AREAS.forEach(function(a,i){sel.innerHTML+='<option value="'+i+'">'+a+'</option>'});
 function msg(t,good){var m=document.getElementById("aMsg");m.textContent=t;m.className=good?"good":""}
@@ -191,11 +195,11 @@ document.getElementById("reset").onclick=function(){if(confirm("Clear every appr
 document.getElementById("save").onclick=async function(){
 var btn=this,old=btn.textContent;btn.disabled=true;btn.textContent="Preparing report...";
 try{
-var s=status();if(s.und||!s.ap)throw new Error("Review every completed item before downloading.");
+var s=status();if(s.und||!s.ap||(S.rev||"").trim().length<3)throw new Error("Review every completed item and enter the reviewer name before downloading.");
 var J=window.jspdf&&window.jspdf.jsPDF;if(!J)throw new Error("The PDF library did not load. Reload the page and try again.");
 var doc=new J({unit:"mm",format:"a4"});
 var W=210,M=18,TW=W-2*M,y=M,rev=s.rev,op=s.op;
-var PREP="Kennedy Ngatia",REVR="Timothy",dateStr=today(),revDate=S.rd||dateStr;
+var PREP="Kennedy Ngatia",REVR=(S.rev||"").trim(),dateStr=today(),revDate=S.rd||dateStr;
 function pg(n){if(y+n>278){doc.addPage();y=M}}
 function tx(t,sz,b,col,gap,ind){doc.setFont("helvetica",b?"bold":"normal");doc.setFontSize(sz);var c=col||[25,25,25];doc.setTextColor(c[0],c[1],c[2]);var x=M+(ind||0);var ls=doc.splitTextToSize(String(t),TW-(ind||0));var lh=sz*0.3528*1.4;ls.forEach(function(l){pg(lh);doc.text(l,x,y+lh*0.75);y+=lh});y+=gap||0}
 function hd(t){pg(16);y+=5;tx(t,13,true,[27,107,74],1);doc.setDrawColor(27,107,74);doc.setLineWidth(0.5);doc.line(M,y,W-M,y);y+=3}
@@ -211,11 +215,11 @@ doc.setFillColor(27,107,74);doc.rect(0,0,W,38,"F");
 doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");doc.setFontSize(24);doc.text("Coffee ERP System",M,17);
 doc.setFont("helvetica","normal");doc.setFontSize(13);doc.text("Progress and Acceptance Report",M,26);
 y=48;
-var meta=[["Prepared by",PREP],["Prepared for","The Administrator"],["Report date",dateStr],["Reviewed by",REVR],["Review date",revDate]];
+var meta=[["Prepared for","Minnesota Coffee Marketers Limited"],["Attention","The Administrator"],["Prepared by",PREP],["Report date",dateStr],["Reviewed by",REVR],["Review date",revDate]];
 meta.forEach(function(r){doc.setFont("helvetica","bold");doc.setFontSize(10);doc.setTextColor(90,90,90);doc.text(r[0],M,y);doc.setFont("helvetica","normal");doc.setTextColor(25,25,25);doc.text(r[1],M+34,y);y+=6});
 y+=2;
 hd("1. Purpose");
-tx("This report documents the work completed on the Coffee ERP System, the review and acceptance status of each completed feature, and the items that remain outstanding. It is submitted to the Administrator for information and record.",10.5,false,null,2);
+tx("This report documents the work completed on the Coffee ERP System, the review and acceptance status of each completed feature, and the items that remain outstanding. It is submitted to the Administrator of Minnesota Coffee Marketers Limited for information and record.",10.5,false,null,2);
 hd("2. Summary of status");
 tx("A total of "+rev.length+" features have been completed and reviewed. Of these, "+s.ap+" have been approved"+(s.rw?" and "+s.rw+" have been returned for further work":"")+". "+op.length+" item"+(op.length===1?" remains":"s remain")+" outstanding.",10.5,false,null,3);
 var rows=[["Completed features reviewed",rev.length],["Approved",s.ap],["Returned for further work",s.rw],["Outstanding items",op.length]];
