@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Coffee ERP System: Progress and Acceptance Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{--bg:#f4f6f3;--card:#fff;--ink:#1c2924;--mute:#5d6b65;--line:#d9dfdb;--ok:#1b6b4a;--okbg:#e2f2ea;--bad:#a3262f;--badbg:#fbe6e8;--open:#8a6a12;--openbg:#f7efd3;--acc:#1b6b4a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121916;--card:#1a2420;--ink:#e6ede9;--mute:#9aa9a2;--line:#2c3a34;--ok:#59c796;--okbg:#17352a;--bad:#f08088;--badbg:#3a1c20;--open:#e3c365;--openbg:#35300f;--acc:#59c796}}
+:root[data-theme="dark"]{--bg:#121916;--card:#1a2420;--ink:#e6ede9;--mute:#9aa9a2;--line:#2c3a34;--ok:#59c796;--okbg:#17352a;--bad:#f08088;--badbg:#3a1c20;--open:#e3c365;--openbg:#35300f;--acc:#59c796}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*:before,*:after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:860px;margin:0 auto;padding:24px 16px 80px}
+h1{font-size:clamp(26px,5vw,36px);line-height:1.15;margin:0 0 6px;letter-spacing:-.02em}
+h2{font-size:20px;margin:36px 0 12px;padding-bottom:6px;border-bottom:2px solid var(--ink)}
+.sub{color:var(--mute);margin:0 0 20px}
+.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px}
+label{font-size:13px;color:var(--mute);display:block;margin-bottom:3px}
+input,select,textarea{width:100%;font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:6px;padding:8px 10px}
+input[readonly]{background:var(--bg);font-weight:600}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding:10px 0;border-bottom:1px solid var(--line)}
+.track{height:10px;background:var(--line);border-radius:5px;overflow:hidden}
+.fill{height:100%;background:var(--ok);width:0;transition:width .3s}
+.stats{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:14px;margin-top:6px;justify-content:space-between;align-items:center}
+.hint{font-size:13px;color:var(--bad);margin-top:6px}.hint.good{color:var(--ok)}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+button{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 14px;border-radius:6px;font-weight:500}
+button:hover:not(:disabled){border-color:var(--ink)}
+button:disabled{opacity:.45;cursor:not-allowed}
+.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.item{background:var(--card);border:1px solid var(--line);border-left:6px solid var(--line);border-radius:8px;padding:14px 16px;margin-bottom:10px}
+.item.approved{border-left-color:var(--ok)}.item.rework{border-left-color:var(--bad)}.item.open{border-left-color:var(--open)}
+.top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.item h3{margin:0;font-size:17px}
+.item p{margin:6px 0 0;color:var(--mute);font-size:15px}
+.tag{font-size:12px;font-weight:600;padding:2px 8px;border-radius:99px;white-space:nowrap;background:var(--line);color:var(--ink)}
+.tag.approved{background:var(--okbg);color:var(--ok)}.tag.rework{background:var(--badbg);color:var(--bad)}.tag.open{background:var(--openbg);color:var(--open)}
+.act{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.act button.on-ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.act button.on-bad{background:var(--bad);border-color:var(--bad);color:#fff}
+.note{margin-top:8px}.note textarea{min-height:44px;resize:vertical;font-size:14px}
+.note textarea.need{border-color:var(--bad)}
+details.add{background:var(--card);border:1px dashed var(--mute);border-radius:8px;padding:12px 16px;margin-top:18px}
+details.add summary{cursor:pointer;font-weight:600}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
+@media(max-width:560px){.row{grid-template-columns:1fr}}
+#aMsg{margin:10px 0 0;font-size:14px;color:var(--bad)}#aMsg.good{color:var(--ok)}
+</style>
+</head>
+<body>
+<main>
+<h1>Coffee ERP System</h1>
+<p class="sub">Progress and acceptance report. Review each completed feature, then approve it or return it with a comment.</p>
+<div class="meta">
+<div><label>Prepared by</label><input readonly value="Kennedy Ngatia"></div>
+<div><label>Reviewed by</label><input id="revBy" readonly></div>
+<div><label>Review date</label><input id="revDt" readonly></div>
+</div>
+<div class="bar">
+<div class="track"><div class="fill" id="fill"></div></div>
+<div class="stats"><span id="count" aria-live="polite"></span>
+<span class="btns"><button id="save" class="primary" disabled>Download report (PDF)</button><button id="reset">Clear all approvals</button></span></div>
+<div class="hint" id="hint"></div>
+</div>
+<div id="app"></div>
+<details class="add" id="addbox">
+<summary>Add a missing item</summary>
+<div class="row">
+<div><label for="aArea">Area</label><select id="aArea"></select></div>
+<div><label for="aType">Add it as</label><select id="aType"><option value="done">Completed work (needs approval)</option><option value="open">Outstanding item (not yet built)</option></select></div>
+</div>
+<label for="aTitle">Title</label><input id="aTitle" placeholder="e.g. Export grower list to Excel">
+<label for="aDesc" style="margin-top:10px">Description</label><textarea id="aDesc" rows="3" placeholder="Describe what was done or what is required"></textarea>
+<p style="margin:10px 0 0"><button class="primary" id="aBtn">Add item</button></p>
+<p id="aMsg" aria-live="polite"></p>
+</details>
+</main>
+<script>
+var AREAS=["Growers","Agents and brokers","Milling statements","Catalogue and stock","Sales and statements","Notifications and reports"];
+var BASE=[
+{id:"g1",a:0,t:"Growers sharing a CBK code",d:"Several growers can now be registered under one CBK code. An entry is rejected only where both the code and the name match an existing grower."},
+{id:"g2",a:0,t:"Multiple contact details per grower",d:"A grower record can hold more than one phone number and email address. At least one contact detail is required to save a record; email is optional where a phone number is given, and the reverse."},
+{id:"g3",a:0,t:"Grower deletion",d:"Administrators can delete growers entered in error, such as duplicate entries."},
+{id:"g4",a:0,t:"Responsive grower approval table",d:"The approve and activate options are now visible on smaller screens without zooming out."},
+{id:"b1",a:1,t:"Agents and brokers linked to growers",d:"Agents (support personnel) can be registered and tied to growers, with sales viewable per agent. Minnesota is registered as the default."},
+{id:"b2",a:1,t:"Agent and grower performance",d:"The system reports how each grower brought in by an agent is performing and identifies the best performing agent."},
+{id:"b3",a:1,t:"Grower acquisition cost",d:"The amount spent to secure a grower's contract can be recorded, allowing the return on that investment to be assessed against the grower's sales."},
+{id:"m1",a:2,t:"Improved AI reading of milling statements",d:"Reading accuracy has improved. Millers such as Hema are now recognised correctly when a milling statement is uploaded."},
+{id:"m2",a:2,t:"Milling charges stored by component",d:"Each charge (milling, transport, export and so on) is stored individually, not only as a total, so errors in a miller's printed total are visible."},
+{id:"c1",a:3,t:"Direct sale",d:"A lot can be marked as a direct sale. It is withdrawn from inventory and the catalogue, and appears as a direct sale on the grower's account and the sales page."},
+{id:"c2",a:3,t:"Splitting grades into lots",d:"A grade can be split by kilograms or bags and offered as separate lots on different sales. Bulked or already offered coffee cannot be split."},
+{id:"c3",a:3,t:"Stock status on the grower profile",d:"The grower's earnings tab shows quantities in stock, offered and sold."},
+{id:"c4",a:3,t:"Catalogue administration",d:"Administrators can delete a catalogue from the catalogue list, and the add charge function now works."},
+{id:"s1",a:4,t:"Final sale charges",d:"Sale charges start from the milling statement figures and can be corrected. The saved figures feed the report, and later sales from the same outturn are not deducted twice."},
+{id:"s2",a:4,t:"Preview before sending sale statements",d:"Statements are previewed and are not sent until confirmed. The grower name is now shown on the sale view."},
+{id:"o1",a:3,t:"Sample weight logic on the catalogue",d:"Lock the original lot weight, add a final weight field, and treat the difference as the sample so that it is removed from stock.",open:1},
+{id:"o2",a:3,t:"Return of unsold bags to stock",d:"Where only part of a lot sells (for example 25 of 30 bags), the remainder should return to stock and the catalogue weight should update without a page reload.",open:1},
+{id:"o3",a:2,t:"Per-grower charge editing for bulk lots",d:"A single screen to search a grower, change charges and add a missing charge for clean and parchment bulks containing many growers.",open:1},
+{id:"o4",a:4,t:"Upload of the miller's charges document",d:"Allow the document emailed by the miller to be uploaded on the sale statement and read by AI, as is done for milling statements.",open:1},
+{id:"o5",a:5,t:"WhatsApp notifications",d:"Send sale statements, catalogue notices and stock status updates by WhatsApp as well as email. SMS is planned for a later phase.",open:1},
+{id:"o6",a:5,t:"Client templates and logo",d:"Apply the client's offer notification, stock status, final catalogue and milling statement templates, including the logo.",open:1},
+{id:"o7",a:5,t:"Report layout per outturn and combined",d:"A one-page summary view with popup and print layout, per outturn and for all outturns combined.",open:1},
+{id:"o8",a:3,t:"Automatic refresh on the catalogue tab",d:"Actions such as undoing a sale should update the available options without reloading the page.",open:1},
+{id:"o9",a:3,t:"Upload of previous stock",d:"Load the client's previous stock document into the system.",open:1}
+];
+var S={custom:[],st:{},done:{},rd:""};
+var KEY="erp-signoff-v2";
+try{var r=localStorage.getItem(KEY);if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function esc(x){return String(x).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function all(){return BASE.concat(S.custom)}
+function isOpen(i){return !!i.open&&!S.done[i.id]}
+function today(){return new Date().toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"})}
+var LBL={approved:"Approved",rework:"Needs work"};
+function card(i){
+var st=S.st[i.id]||{},op=isOpen(i),cls=op?"open":(st.v||"");
+var tag=op?"Outstanding":(st.v?LBL[st.v]:"Awaiting review");
+var h='<div class="item '+cls+'"><div class="top"><h3>'+esc(i.t)+'</h3><span class="tag '+cls+'">'+tag+'</span></div><p>'+esc(i.d)+'</p><div class="act">';
+if(op){h+='<button data-done="'+i.id+'">Mark as completed</button>'}
+else{h+='<button data-id="'+i.id+'" data-v="approved" class="'+(st.v==="approved"?"on-ok":"")+'">&#10003; Approve</button><button data-id="'+i.id+'" data-v="rework" class="'+(st.v==="rework"?"on-bad":"")+'">Needs work</button>'}
+if(i.c)h+='<button data-rm="'+i.id+'">Remove</button>';
+h+='</div>';
+if(!op)h+='<div class="note"><textarea data-n="'+i.id+'" class="'+(st.v==="rework"&&!(st.n||"").trim()?"need":"")+'" placeholder="'+(st.v==="rework"?"Comment required: say what needs to change":"Comment (optional)")+'">'+esc(st.n||"")+'</textarea></div>';
+return h+'</div>';
+}
+function revItems(){return all().filter(function(i){return!isOpen(i)})}
+function status(){
+var rev=revItems(),op=all().filter(isOpen);
+function g(i){return(S.st[i.id]||{})}
+var ap=rev.filter(function(i){return g(i).v==="approved"}).length;
+var rw=rev.filter(function(i){return g(i).v==="rework"}).length;
+var und=rev.length-ap-rw;
+var noNote=rev.filter(function(i){return g(i).v==="rework"&&!(g(i).n||"").trim()}).length;
+document.getElementById("fill").style.width=(rev.length?ap/rev.length*100:0)+"%";
+document.getElementById("count").textContent=ap+" of "+rev.length+" approved"+(rw?", "+rw+" need work":"")+(op.length?", "+op.length+" outstanding":"");
+var m=[];
+if(und)m.push(und+" completed item"+(und>1?"s":"")+" still to be approved or returned");
+if(noNote)m.push(noNote+" returned item"+(noNote>1?"s need":" needs")+" a comment");
+var ok=!m.length&&ap>0;
+var hint=document.getElementById("hint");
+hint.textContent=ok?"All items reviewed. The report can be downloaded.":"To download the report: "+m.join("; ")+".";
+hint.className="hint"+(ok?" good":"");
+document.getElementById("save").disabled=!ok;
+document.getElementById("revBy").value=ap>0?"Timothy":"Awaiting approval";
+document.getElementById("revDt").value=ap>0&&S.rd?S.rd:"Not yet reviewed";
+return{ap:ap,rw:rw,und:und,op:op,rev:rev};
+}
+function render(){
+var h="",items=all();
+AREAS.forEach(function(a,ai){
+var l=items.filter(function(i){return i.a===ai&&!isOpen(i)});
+if(l.length)h+='<h2>'+a+'</h2>'+l.map(card).join("");
+});
+var op=items.filter(isOpen);
+if(op.length)h+='<h2>Outstanding items</h2>'+op.map(card).join("");
+document.getElementById("app").innerHTML=h;
+status();
+}
+var app=document.getElementById("app");
+app.addEventListener("click",function(e){
+var b=e.target.closest("button");if(!b)return;
+if(b.dataset.id){var st=S.st[b.dataset.id]=S.st[b.dataset.id]||{};st.v=(st.v===b.dataset.v)?"":b.dataset.v;S.rd=today();save();render()}
+else if(b.dataset.done){S.done[b.dataset.done]=true;save();render()}
+else if(b.dataset.rm){if(confirm("Remove this item?")){S.custom=S.custom.filter(function(i){return i.id!==b.dataset.rm});delete S.st[b.dataset.rm];save();render()}}
+});
+app.addEventListener("input",function(e){
+var id=e.target.dataset.n;if(!id)return;
+(S.st[id]=S.st[id]||{}).n=e.target.value;save();status();
+e.target.classList.toggle("need",S.st[id].v==="rework"&&!e.target.value.trim());
+});
+var sel=document.getElementById("aArea");
+AREAS.forEach(function(a,i){sel.innerHTML+='<option value="'+i+'">'+a+'</option>'});
+function msg(t,good){var m=document.getElementById("aMsg");m.textContent=t;m.className=good?"good":""}
+document.getElementById("aBtn").onclick=function(){
+var t=document.getElementById("aTitle").value.trim(),d=document.getElementById("aDesc").value.trim();
+if(t.length<4){msg("Enter a title of at least 4 characters.");return}
+if(d.length<10){msg("Add a short description (at least 10 characters) so the reviewer knows what to check.");return}
+var dup=all().some(function(i){return i.t.toLowerCase()===t.toLowerCase()});
+if(dup){msg("An item with this title already exists. Use a different title.");return}
+var open=document.getElementById("aType").value==="open",a=+sel.value;
+S.custom.push({id:"x"+Date.now(),a:a,t:t,d:d,open:open?1:0,c:1});
+document.getElementById("aTitle").value="";document.getElementById("aDesc").value="";
+save();render();
+msg("Added to "+(open?"Outstanding items":"Completed work under "+AREAS[a]+", where it can now be approved")+".",true);
+};
+document.getElementById("reset").onclick=function(){if(confirm("Clear every approval and comment? Added items stay.")){S.st={};S.rd="";save();render()}};
+document.getElementById("save").onclick=async function(){
+var btn=this,old=btn.textContent;btn.disabled=true;btn.textContent="Preparing report...";
+try{
+var s=status();if(s.und||!s.ap)throw new Error("Review every completed item before downloading.");
+var J=window.jspdf&&window.jspdf.jsPDF;if(!J)throw new Error("The PDF library did not load. Reload the page and try again.");
+var doc=new J({unit:"mm",format:"a4"});
+var W=210,M=18,TW=W-2*M,y=M,rev=s.rev,op=s.op;
+var PREP="Kennedy Ngatia",REVR="Timothy",dateStr=today(),revDate=S.rd||dateStr;
+function pg(n){if(y+n>278){doc.addPage();y=M}}
+function tx(t,sz,b,col,gap,ind){doc.setFont("helvetica",b?"bold":"normal");doc.setFontSize(sz);var c=col||[25,25,25];doc.setTextColor(c[0],c[1],c[2]);var x=M+(ind||0);var ls=doc.splitTextToSize(String(t),TW-(ind||0));var lh=sz*0.3528*1.4;ls.forEach(function(l){pg(lh);doc.text(l,x,y+lh*0.75);y+=lh});y+=gap||0}
+function hd(t){pg(16);y+=5;tx(t,13,true,[27,107,74],1);doc.setDrawColor(27,107,74);doc.setLineWidth(0.5);doc.line(M,y,W-M,y);y+=3}
+function sub(t){pg(12);y+=2;tx(t,11,true,[25,25,25],1)}
+var SC={approved:[27,107,74],rework:[163,38,47]};
+function item(i){
+var st=S.st[i.id]||{};pg(20);tx(i.t,10.5,true,null,0.5,3);tx(i.d,10,false,[70,70,70],0.5,3);
+if(isOpen(i))tx("Status: Outstanding",9.5,true,[138,106,18],0,3);
+else tx("Status: "+(st.v==="approved"?"Approved":"Returned for further work"),9.5,true,SC[st.v],0,3);
+if(st.n&&st.n.trim())tx("Reviewer comment: "+st.n.trim(),9.5,false,null,0,3);
+y+=3.5}
+doc.setFillColor(27,107,74);doc.rect(0,0,W,38,"F");
+doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");doc.setFontSize(24);doc.text("Coffee ERP System",M,17);
+doc.setFont("helvetica","normal");doc.setFontSize(13);doc.text("Progress and Acceptance Report",M,26);
+y=48;
+var meta=[["Prepared by",PREP],["Prepared for","The Administrator"],["Report date",dateStr],["Reviewed by",REVR],["Review date",revDate]];
+meta.forEach(function(r){doc.setFont("helvetica","bold");doc.setFontSize(10);doc.setTextColor(90,90,90);doc.text(r[0],M,y);doc.setFont("helvetica","normal");doc.setTextColor(25,25,25);doc.text(r[1],M+34,y);y+=6});
+y+=2;
+hd("1. Purpose");
+tx("This report documents the work completed on the Coffee ERP System, the review and acceptance status of each completed feature, and the items that remain outstanding. It is submitted to the Administrator for information and record.",10.5,false,null,2);
+hd("2. Summary of status");
+tx("A total of "+rev.length+" features have been completed and reviewed. Of these, "+s.ap+" have been approved"+(s.rw?" and "+s.rw+" have been returned for further work":"")+". "+op.length+" item"+(op.length===1?" remains":"s remain")+" outstanding.",10.5,false,null,3);
+var rows=[["Completed features reviewed",rev.length],["Approved",s.ap],["Returned for further work",s.rw],["Outstanding items",op.length]];
+rows.forEach(function(r,k){pg(7);if(k%2)doc.setFillColor(255,255,255);else doc.setFillColor(240,244,241);doc.rect(M,y,TW,7,"F");doc.setFont("helvetica","normal");doc.setFontSize(10);doc.setTextColor(25,25,25);doc.text(r[0],M+3,y+4.9);doc.setFont("helvetica","bold");doc.text(String(r[1]),W-M-3,y+4.9,{align:"right"});y+=7});
+y+=2;
+hd("3. Work completed");
+var n=0;
+AREAS.forEach(function(a,ai){var l=rev.filter(function(i){return i.a===ai});if(!l.length)return;n++;sub("3."+n+"  "+a);l.forEach(item)});
+var sec=4;
+if(op.length){hd("4. Outstanding items");tx("The following items have been identified but are not yet complete. They will be scheduled for the next phase of work.",10.5,false,null,3);
+var m=0;AREAS.forEach(function(a,ai){var l=op.filter(function(i){return i.a===ai});if(!l.length)return;m++;sub("4."+m+"  "+a);l.forEach(item)});sec=5}
+hd(sec+". Acceptance and sign-off");
+tx("The features marked as approved in Section 3 were reviewed by "+REVR+" on "+revDate+" and accepted as complete and working."+(s.rw?" Features returned for further work will be corrected and resubmitted for approval.":""),10.5,false,null,2);
+pg(40);y+=18;
+doc.setDrawColor(25,25,25);doc.setLineWidth(0.3);doc.line(M,y,M+70,y);doc.line(W-M-70,y,W-M,y);
+doc.setFont("helvetica","normal");doc.setFontSize(9);doc.setTextColor(90,90,90);
+doc.text("Prepared by: "+PREP,M,y+5);doc.text("Approved by: "+REVR,W-M-70,y+5);
+doc.text("Date: "+dateStr,M,y+10);doc.text("Date: "+revDate,W-M-70,y+10);
+var N=doc.getNumberOfPages();
+for(var p=1;p<=N;p++){doc.setPage(p);doc.setFontSize(8.5);doc.setTextColor(120,120,120);doc.text("Coffee ERP System - Progress and Acceptance Report",M,290);doc.text("Page "+p+" of "+N,W-M,290,{align:"right"})}
+var blob=doc.output("blob"),fname="Coffee-ERP-System-Progress-Report.pdf";
+{var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=fname;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href)},4000)}
+}catch(e){if(!e||e.code!=="declined")alert("Could not create the report: "+((e&&e.message)||e))}
+finally{btn.textContent=old;status()}
+};
+render();
+</script>
+</body>
+</html>
